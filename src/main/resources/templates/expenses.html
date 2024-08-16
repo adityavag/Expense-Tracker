@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Expense Tracker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        /* Keep all the previous styles */
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
@@ -13,16 +15,19 @@
             padding: 20px;
             background-color: #f4f4f4;
         }
+
         h1, h2 {
             color: #2c3e50;
         }
+
         form {
             background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
+
         input, select, button {
             width: 100%;
             padding: 10px;
@@ -31,6 +36,7 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
+
         button {
             background-color: #3498db;
             color: white;
@@ -38,41 +44,50 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+
         button:hover {
             background-color: #2980b9;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             background: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
         }
+
         th, td {
             text-align: left;
             padding: 12px;
             border-bottom: 1px solid #ddd;
         }
+
         th {
             background-color: #3498db;
             color: white;
         }
+
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+
         /* Responsive table adjustments */
         @media (max-width: 600px) {
             table, thead, tbody, th, td, tr {
                 display: block;
             }
+
             tr {
                 margin-bottom: 15px;
             }
+
             th, td {
                 text-align: right;
                 padding-left: 50%;
                 position: relative;
             }
+
             th::before, td::before {
                 content: attr(data-label);
                 position: absolute;
@@ -82,18 +97,31 @@
                 font-weight: bold;
                 text-align: left;
             }
+
             th:last-child, td:last-child {
                 border-bottom: 0;
             }
         }
+
+        /* Add styles for the chart container */
+        #chartContainer {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
     </style>
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
     <h1>Expense Tracker</h1>
     <div>
         <h2 th:text="'Welcome ' + ${username} + '!'"></h2>
     </div>
-    
+
     <h2>Add Expense</h2>
     <form th:action="@{/expenses}" method="post">
         <input type="text" name="title" placeholder="Title" required>
@@ -129,5 +157,62 @@
             </tr>
         </tbody>
     </table>
+
+    <div id="chartContainer">
+        <h2>Total Expenses by Category</h2>
+        <canvas id="expenseChart"></canvas>
+    </div>
+
+    <script th:inline="javascript">
+        // Prepare data for the chart
+        const expenseData = {
+            labels: [],
+            datasets: [{
+                label: 'Expenses by Category',
+                data: [],
+                backgroundColor: [
+                    '#3498db',
+                    '#2ecc71',
+                    '#e74c3c',
+                    '#f1c40f',
+                    '#9b59b6'
+                ],
+                hoverBackgroundColor: [
+                    '#2980b9',
+                    '#27ae60',
+                    '#c0392b',
+                    '#f39c12',
+                    '#8e44ad'
+                ]
+            }]
+        };
+
+        // Populate chart data from Thymeleaf model
+        const expensesByCategory = /*[[${expensesByCategory}]]*/ {};
+        for (const [category, amount] of Object.entries(expensesByCategory)) {
+            expenseData.labels.push(category);
+            expenseData.datasets[0].data.push(amount);
+        }
+
+        // Create the pie chart
+        const ctx = document.getElementById('expenseChart').getContext('2d');
+        const expenseChart = new Chart(ctx, {
+            type: 'pie',
+            data: expenseData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        display: true
+                    },
+                    tooltip: {
+                        enabled: true,
+                    }
+                }
+            }
+        });
+    </script>
 </body>
+
 </html>
