@@ -1,0 +1,4 @@
+api/expense/ExpenseRepository.class
+api/expense/ExpenseController.class
+api/expense/Expense.class
+api/expense/ExpenseApplication.class
